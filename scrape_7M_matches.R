@@ -23,4 +23,5 @@ python.exec('eng1112 = get_7M_matches(url1112)')
 eng0910 <- data.frame(python.get('eng0910'))
 eng1011 <- data.frame(python.get('eng1011'))
 eng1112 <- data.frame(python.get('eng1112'))
+rm(url0910, url1011, url1112)
 
