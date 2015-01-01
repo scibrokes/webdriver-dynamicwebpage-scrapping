@@ -1,0 +1,52 @@
+---
+title: "Testing Efficiency of Web Scraping - Webdriver"
+author: "englianhu"
+date: "Thursday, January 01, 2015"
+output: html_document
+---
+
+There are speed comparison between call Py-script and RSelenium through Webdriver  <https://github.com/englianhu/WebDriver-DynamicWebpage-Scrapping>.
+
+```{r}
+#### Using rPython to call py script
+
+library(rPython)
+#'python.exec('from selenium import webdriver')
+#'python.exec('browser = webdriver.Chrome()')
+#'python.exec('browser.set_window_size(1015, 600)')
+#'python.exec('browser.set_window_position(0, 200)')
+
+#'python.load('C:/Users/Scibrokes Trading/Documents/GitHub/englianhu/WebDriver-DynamicWebpage-Scrapping/7M.py')
+#'python.load('C:/Users/Scibrokes Trading/Documents/Github/englianhu/WebDriver-DynamicWebpage-Scrapping/NowGoal.py')
+python.load('C:/Users/Scibrokes Trading/Documents/Github/englianhu/WebDriver-DynamicWebpage-Scrapping/Pymodel.py')
+url0910 = 'http://data2.7m.cn/history_Matches_Data/2009-2010/92/en/index.shtml'
+
+python.assign('url0910', url0910)
+system.time(python.exec('eng0910 = get_7M_matches(url0910)'))
+```
+
+```{r}
+library(RSelenium)
+lnk <- 'http://data2.7m.cn/history_Matches_Data/2009-2010/92/en/index.shtml'
+
+remDr <- remoteDriver(browserName = "chrome")
+#'remDr$setImplicitWaitTimeout(3000)
+remDr$open()
+remDr$navigate(lnk)
+
+tableElem <- remDr$findElement("id", "e_run_tb")
+xData <- tableElem$getElementAttribute("outerHTML")[[1]]
+xData <- htmlParse(xData, encoding = "UTF-8")
+mRnd <- readHTMLTable(xData)$e_run_tb
+rm(tableElem, xData)
+
+system.time(lapply(as.list(seq(nrow(mRnd))), function(i){
+  lapply(as.list(seq(ncol(mRnd))), function(j){
+    webElem <- remDr$findElement(using = 'xpath', paste0('//*[@id="e_run_tb"]/tbody/tr[',i,']/td[',j,']'))
+    webElem$clickElement()
+
+    tableElem <- remDr$findElement("id", "Match_Table")
+    xData <- tableElem$getElementAttribute("outerHTML")[[1]]
+    xData <- htmlParse(xData, encoding = "UTF-8")
+    readHTMLTable(xData)})}))
+```
