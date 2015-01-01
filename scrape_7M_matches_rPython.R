@@ -25,3 +25,5 @@ eng1011 <- data.frame(python.get('eng1011'))
 eng1112 <- data.frame(python.get('eng1112'))
 rm(url0910, url1011, url1112)
 
+python.exec('browser.quit()')
+
